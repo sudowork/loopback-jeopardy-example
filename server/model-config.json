@@ -12,5 +12,9 @@
       "../common/mixins",
       "./mixins"
     ]
+  },
+  "jeopardyQuestion": {
+    "dataSource": "mongo",
+    "public": true
   }
 }
