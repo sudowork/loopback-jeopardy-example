@@ -1,7 +1,18 @@
 'use strict';
 
 module.exports = function(Jeopardyquestion) {
-  const connect = (callback) => Jeopardyquestion.getDataSource().connector.connect(callback);
+  const withCollection = (collectionName, method) => {
+    return (callback) => {
+      Jeopardyquestion.getDataSource().connector.connect((err, db) => {
+        if (err) {
+          return callback(err);
+        }
+        const collection = db.collection(collectionName);
+        method(collection, callback);
+      });
+    };
+  };
+  const withJeopardy = (callback) => withCollection('jeopardy', callback);
 
   Jeopardyquestion.remoteMethod(
     'random',
@@ -17,17 +28,14 @@ module.exports = function(Jeopardyquestion) {
       },
     }
   );
-  Jeopardyquestion.random = (callback) => {
-    connect((err, db) => {
-      const collection = db.collection('jeopardy');
-      collection.aggregate([
-        {$sample: {size: 1}},
-      ], (err, data) => {
-        if (err) {
-          return callback(err);
-        }
-        callback(null, data);
-      });
+  Jeopardyquestion.random = withJeopardy((collection, callback) => {
+    collection.aggregate([
+      {$sample: {size: 1}},
+    ], (err, data) => {
+      if (err) {
+        return callback(err);
+      }
+      callback(null, data);
     });
-  };
+  });
 };
