@@ -38,4 +38,27 @@ module.exports = function(Jeopardyquestion) {
       callback(null, data);
     });
   });
+
+  Jeopardyquestion.remoteMethod(
+    'categories',
+    {
+      http: {
+        path: '/categories',
+        verb: 'get',
+      },
+      description: 'Get lists of categories',
+      returns: {
+        arg: 'categories',
+        type: 'json',
+      },
+    }
+  );
+  Jeopardyquestion.categories = withJeopardy((collection, callback) => {
+    collection.distinct('category', (err, data) => {
+      if (err) {
+        return callback(err);
+      }
+      callback(null, data);
+    });
+  });
 };
