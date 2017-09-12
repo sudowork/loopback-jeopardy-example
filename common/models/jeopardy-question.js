@@ -1,6 +1,8 @@
 'use strict';
 
 module.exports = function(Jeopardyquestion) {
+  const connect = (callback) => Jeopardyquestion.getDataSource().connector.connect(callback);
+
   Jeopardyquestion.remoteMethod(
     'random',
     {
@@ -16,7 +18,7 @@ module.exports = function(Jeopardyquestion) {
     }
   );
   Jeopardyquestion.random = (callback) => {
-    Jeopardyquestion.getDataSource().connector.connect((err, db) => {
+    connect((err, db) => {
       const collection = db.collection('jeopardy');
       collection.aggregate([
         {$sample: {size: 1}},
